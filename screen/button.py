@@ -67,7 +67,6 @@ class Button:
 
     def isMouseOverButton(self, events):
         x, y = pygame.mouse.get_pos()
-        print(x, y)
         if (
             x >= self.x 
             and x <= self.x + self.width 

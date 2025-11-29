@@ -8,7 +8,7 @@ class Random:
         self.wait = wait
         self.startRound = False
 
-    def getMove(self, events):
+    def getMove(self, events = False):
         current_time = time.time()
 
         if (self.startRound == False):

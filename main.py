@@ -8,8 +8,8 @@ from screen.button import Button
 from helpers.events import Events
 
 class TicTacToe:
-    def __init__(self, cellSize = 150):
-        self.game = Game(3, 3)
+    def __init__(self, cellSize = 140):
+        self.game = Game(5, 4)
         self.cellSize = cellSize
         self.boardWidth = self.game.boardSize * cellSize
         self.windowWidth = self.boardWidth
@@ -139,11 +139,11 @@ class TicTacToe:
         endButton.display(self.screen, self.events)
 
     def startGame(self):
+        self.game.resetGame()
         self.menu = 0
 
     def stopGame(self):
         self.menu = 1
-        self.game.resetGame()
 
     def exit(self):
         pygame.quit()
@@ -163,16 +163,15 @@ class TicTacToe:
                     if ((x + y) % 2 == 0):
                         color = (205,205,205)
                         if isMouseOver:
-                            color = color = (190,190,220)
+                            color = color = (190,190,230)
                         self.printO(x , y, color)
                     else:
                         color = (205,205,205)
                         if isMouseOver:
-                            color = color = (220,190,190)
+                            color = color = (230,190,190)
                         self.printX(x , y, color)
 
     def run(self):
-        print("Run")
         while True:
             self.events.reset();
             if self.events.QUIT:
@@ -186,6 +185,9 @@ class TicTacToe:
                 self.game.run(self.events)
                 self.printGame()
             pygame.display.flip()
+
+    def train(self, gamesQty):
+        pass
 
 ticTacToe = TicTacToe()
 player1 = Human("Player Blue", ticTacToe)
