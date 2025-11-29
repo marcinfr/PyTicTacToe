@@ -7,10 +7,9 @@ class Human:
         self.ticTacToe = ticTacToe
 
     def getMove(self, events):
-        for event in events:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = event.pos
-                self.move = self.ticTacToe.getCellByPosition(pos[0], pos[1])
+        if events.MOUSEBUTTONDOWN:
+            pos = events.EVENTPOSITION
+            self.move = self.ticTacToe.getCellByPosition(pos[0], pos[1])
         return self.move
     
     def endMove(self):

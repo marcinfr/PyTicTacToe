@@ -1,15 +1,18 @@
-from gameHelpers.resultChecker import ResultChecker
+from helpers.resultChecker import ResultChecker
 
 class Game:
     def __init__(self, boardSize=3, linesToWin=3):
         print("Init Game")
         self.boardSize = boardSize
-        self.board = self.array = [[0 for _ in range(boardSize)] for _ in range(boardSize)]
         self.linesToWin = linesToWin
-        self.currentPlayer = -1
         self.players = []
-        self.isRunning = 1
         self.resultChecker = ResultChecker();
+        self.resetGame()
+
+    def resetGame(self):
+        self.board = self.array = [[0 for _ in range(self.boardSize)] for _ in range(self.boardSize)]
+        self.currentPlayer = -1
+        self.isRunning = 1
 
     def addPlayer(self, player):
         self.players.append(player)
