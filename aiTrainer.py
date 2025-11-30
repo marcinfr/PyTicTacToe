@@ -1,10 +1,11 @@
 from players.random import Random
+from players.aiMonteCarlo import AiMonteCarlo
 import copy
 
 class AiTrainer:
-    def __init__(self, aiPlayer, gamesToPlay = 20000, generations = 500):
+    def __init__(self, aiPlayer, gamesToPlay = 1000, generations = 50):
         self.gamesToPlay = gamesToPlay
-        self.aiOpponent = Random("test", aiPlayer.game)
+        self.aiOpponent = AiMonteCarlo("test", aiPlayer.game)
         self.aiPlayer = aiPlayer
         self.gamesInGeneration = gamesToPlay // generations
         self.currentScore = 0
@@ -23,12 +24,14 @@ class AiTrainer:
             if (not game.isRunning and self.currentGame < self.gamesToPlay):
                 self.currentGame = self.currentGame + 1
 
+                #print ("!!!" + str(game.winner))
+
                 if (game.winner == 0):
-                    self.currentScore += 0.3
-                if (game.winner == 1): # dziala tylko dla drugiego gracza
+                    self.currentScore += 0.1
+                if (game.winner == 1):
                     self.currentScore += 1
-                #if (game.winner == -1): # dziala tylko dla drugiego gracza
-                #    self.currentScore -= 1
+                if (game.winner == -1):
+                    self.currentScore -= 1
 
                 game.reset()
                 game.isRunning = True
@@ -56,8 +59,6 @@ class AiTrainer:
         self.currentScore = 0
         #self.aiPlayer.neuralNet = copy.deepcopy(self.bestNeuralNet)
         if not self.isFinished():
-            child = copy.deepcopy(self.bestNeuralNet)
-            child.mutate()
-            self.aiPlayer.neuralNet = child
+            self.aiPlayer.neuralNet.mutate()
         else:
             self.aiPlayer.neuralNet = copy.deepcopy(self.bestNeuralNet)

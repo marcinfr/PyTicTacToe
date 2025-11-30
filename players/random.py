@@ -19,11 +19,11 @@ class Random:
             for x in range(0, self.game.boardSize):
                 for y in range(0, self.game.boardSize):
                     if (self.game.board[x][y] == 0):
-                        if random.random() < 0.9:
-                            if (self.game.resultChecker.isWinningMove(self.game, [x, y], 1)):
-                                return [x, y]
-                            if (self.game.resultChecker.isWinningMove(self.game, [x, y], -1)):
-                                return [x, y]
+                        #if random.random() < 0.9:
+                        #    if (self.game.resultChecker.isWinningMove(self.game, [x, y], 1)):
+                        #        return [x, y]
+                        #    if (self.game.resultChecker.isWinningMove(self.game, [x, y], -1)):
+                        #        return [x, y]
                         emptyCells.append([x, y])
             cell = random.choice(emptyCells)
             return cell

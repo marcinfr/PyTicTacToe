@@ -32,6 +32,6 @@ class ResultChecker:
                     self.winningRow[1] = [x,y]
                     return True
             else:
-                if (x != lastMove[0] and y != lastMove[1]):
+                if (x != lastMove[0] or y != lastMove[1]):
                     sameInRow = 0
         return False

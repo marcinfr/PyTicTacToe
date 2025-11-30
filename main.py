@@ -5,6 +5,7 @@ from game import Game
 from players.human import Human
 from players.random import Random
 from players.ai import AiPlayer
+from players.aiMonteCarlo import AiMonteCarlo
 from screen.button import Button
 from helpers.events import Events
 from aiTrainer import AiTrainer
@@ -14,13 +15,14 @@ class TicTacToe:
     STATE_GAME = 1
     STATE_TAINING = 2
 
-    def __init__(self, cellSize = 140):
-        self.game = Game(3, 3)
+    def __init__(self, cellSize = 120):
+        self.game = Game(6, 4)
         self.player1 = Human("Player Blue", self)
         self.aiPlayer = AiPlayer("Ai Player", self.game)
         #self.aiPlayer = Random("Ai Player", self.game)
+        self.aiPlayer = AiMonteCarlo("Ai Player", self.game)
         self.player2 = self.aiPlayer
-        self.player2 = Human("Player Red", self)
+        #self.player2 = Human("Player Red", self)
         self.cellSize = cellSize
         self.boardWidth = self.game.boardSize * cellSize
         self.windowWidth = self.boardWidth
@@ -215,7 +217,7 @@ class TicTacToe:
                 self.exit()
             self.displayBackgroud()
             if self.gameState == self.STATE_TAINING:
-                self.aiTrainer.run(self.game, 20)
+                self.aiTrainer.run(self.game, 10)
                 if (self.aiTrainer.isFinished()):
                     self.gameState = self.STATE_MENU
             if self.gameState == self.STATE_GAME:
