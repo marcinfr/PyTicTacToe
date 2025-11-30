@@ -4,18 +4,29 @@ import math
 from game import Game
 from players.human import Human
 from players.random import Random
+from players.ai import AiPlayer
 from screen.button import Button
 from helpers.events import Events
+from aiTrainer import AiTrainer
 
 class TicTacToe:
+    STATE_MENU = 0
+    STATE_GAME = 1
+    STATE_TAINING = 2
+
     def __init__(self, cellSize = 140):
-        self.game = Game(5, 4)
+        self.game = Game(3, 3)
+        self.player1 = Human("Player Blue", self)
+        self.aiPlayer = AiPlayer("Ai Player", self.game)
+        #self.aiPlayer = Random("Ai Player", self.game)
+        self.player2 = self.aiPlayer
+        self.player2 = Human("Player Red", self)
         self.cellSize = cellSize
         self.boardWidth = self.game.boardSize * cellSize
         self.windowWidth = self.boardWidth
         self.boardHeight = self.game.boardSize * cellSize
         self.windowHeight = self.boardHeight + 60
-        self.menu = 1
+        self.gameState = self.STATE_MENU
         self.events = Events()
         pygame.init()
         pygame.display.set_caption("Tic Tac Toe")
@@ -52,7 +63,7 @@ class TicTacToe:
                     self.printX(x, y)
                 if (self.game.board[x][y] > 0):
                     self.printO(x, y)
-        if (not self.game.isRunning):
+        if (not self.game.isRunning and self.game.winner != 0):
             winnigLine = self.game.resultChecker.winningRow
             pygame.draw.line(
                 self.screen, 
@@ -125,7 +136,19 @@ class TicTacToe:
         startButton = Button(self.windowWidth / 2 - 100, 330, 200, 40, "Start")
         startButton.setOnclick(self.startGame)
         startButton.display(self.screen, self.events)
-        exitButton = Button(self.windowWidth / 2 - 100, 380, 200, 40, "Exit")
+
+        label = "Train AI"
+        if (self.gameState == self.STATE_TAINING):
+            label = "Stop Training"
+        trainAiButton = Button(self.windowWidth / 2 - 100, 380, 200, 40, label)
+        if (self.gameState == self.STATE_TAINING):
+            trainAiButton.setOnclick(self.stopTrainAi)
+            trainAiButton.setHoverBackgroudColor("red")
+        else:
+            trainAiButton.setOnclick(self.trainAi)
+        trainAiButton.display(self.screen, self.events)
+
+        exitButton = Button(self.windowWidth / 2 - 100, 430, 200, 40, "Exit")
         exitButton.setOnclick(self.exit)
         exitButton.setHoverBackgroudColor("red")
         exitButton.display(self.screen, self.events)
@@ -139,19 +162,24 @@ class TicTacToe:
         endButton.display(self.screen, self.events)
 
     def startGame(self):
-        self.game.resetGame()
-        self.menu = 0
+        self.game.reset()
+        self.game.addPlayer(self.player1)
+        self.game.addPlayer(self.player2)
+        self.game.isRunning = True
+        self.aiPlayer.setWait(1)
+        self.gameState = self.STATE_GAME
 
     def stopGame(self):
-        self.menu = 1
+        self.gameState = self.STATE_MENU
+        self.game.isRunning = False
 
     def exit(self):
         pygame.quit()
         sys.exit()
-
+#
     def displayBackgroud(self):
         self.screen.fill("lightgrey")
-        if self.menu == 1:
+        if self.gameState != self.STATE_GAME:
             posX, posY = pygame.mouse.get_pos()
             cell = self.getCellByPosition(posX, posY, False)
             for x in range(0, self.game.boardSize):
@@ -171,28 +199,31 @@ class TicTacToe:
                             color = color = (230,190,190)
                         self.printX(x , y, color)
 
+    def trainAi(self):
+        print("start training")
+        self.aiPlayer.setWait(0)
+        self.aiTrainer = AiTrainer(self.aiPlayer)
+        self.gameState = self.STATE_TAINING
+
+    def stopTrainAi(self):
+        self.gameState = self.STATE_MENU
+
     def run(self):
         while True:
             self.events.reset();
             if self.events.QUIT:
                 self.exit()
-
             self.displayBackgroud()
-
-            if self.menu == 1:
-                self.printMenu()
-            else:
+            if self.gameState == self.STATE_TAINING:
+                self.aiTrainer.run(self.game, 20)
+                if (self.aiTrainer.isFinished()):
+                    self.gameState = self.STATE_MENU
+            if self.gameState == self.STATE_GAME:
                 self.game.run(self.events)
                 self.printGame()
+            else:
+                self.printMenu()
             pygame.display.flip()
 
-    def train(self, gamesQty):
-        pass
-
 ticTacToe = TicTacToe()
-player1 = Human("Player Blue", ticTacToe)
-player2 = Human("Player Red", ticTacToe)
-#player2 = Random("Random", ticTacToe.game, 1)
-ticTacToe.game.addPlayer(player1)
-ticTacToe.game.addPlayer(player2)
 ticTacToe.run()
