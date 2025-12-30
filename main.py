@@ -18,11 +18,12 @@ class TicTacToe:
     def __init__(self, cellSize = 120):
         self.game = Game(6, 4)
         self.player1 = Human("Player Blue", self)
-        self.aiPlayer = AiPlayer("Ai Player", self.game)
+        #self.aiPlayer = AiPlayer("Ai Player", self.game)
         #self.aiPlayer = Random("Ai Player", self.game)
-        self.aiPlayer = AiMonteCarlo("Ai Player", self.game)
-        self.player2 = self.aiPlayer
-        #self.player2 = Human("Player Red", self)
+        #self.aiPlayer = AiMonteCarlo("Ai Player", self.game)
+        #self.aiPlayer.setWait(1)
+        #self.player2 = self.aiPlayer
+        self.player2 = Human("Player Red", self)
         self.cellSize = cellSize
         self.boardWidth = self.game.boardSize * cellSize
         self.windowWidth = self.boardWidth
@@ -139,18 +140,18 @@ class TicTacToe:
         startButton.setOnclick(self.startGame)
         startButton.display(self.screen, self.events)
 
-        label = "Train AI"
-        if (self.gameState == self.STATE_TAINING):
-            label = "Stop Training"
-        trainAiButton = Button(self.windowWidth / 2 - 100, 380, 200, 40, label)
-        if (self.gameState == self.STATE_TAINING):
-            trainAiButton.setOnclick(self.stopTrainAi)
-            trainAiButton.setHoverBackgroudColor("red")
-        else:
-            trainAiButton.setOnclick(self.trainAi)
-        trainAiButton.display(self.screen, self.events)
+        #label = "Train AI"
+        #if (self.gameState == self.STATE_TAINING):
+        #    label = "Stop Training"
+        #trainAiButton = Button(self.windowWidth / 2 - 100, 380, 200, 40, label)
+        #if (self.gameState == self.STATE_TAINING):
+        #    trainAiButton.setOnclick(self.stopTrainAi)
+        #    trainAiButton.setHoverBackgroudColor("red")
+        #else:
+        #    trainAiButton.setOnclick(self.trainAi)
+        #trainAiButton.display(self.screen, self.events)
 
-        exitButton = Button(self.windowWidth / 2 - 100, 430, 200, 40, "Exit")
+        exitButton = Button(self.windowWidth / 2 - 100, 380, 200, 40, "Exit")
         exitButton.setOnclick(self.exit)
         exitButton.setHoverBackgroudColor("red")
         exitButton.display(self.screen, self.events)
@@ -168,7 +169,6 @@ class TicTacToe:
         self.game.addPlayer(self.player1)
         self.game.addPlayer(self.player2)
         self.game.isRunning = True
-        self.aiPlayer.setWait(1)
         self.gameState = self.STATE_GAME
 
     def stopGame(self):
@@ -178,7 +178,7 @@ class TicTacToe:
     def exit(self):
         pygame.quit()
         sys.exit()
-#
+
     def displayBackgroud(self):
         self.screen.fill("lightgrey")
         if self.gameState != self.STATE_GAME:
