@@ -18,26 +18,29 @@ class TicTacToe:
     BOARDS = [
         {
             "size": (3, 3),
-            "winLength": 3
+            "winLength": 3,
+            "varnishingElementsLimit": 3,
         },
         {
             "size": (5, 5),
-            "winLength": 4
+            "winLength": 4,
+            "varnishingElementsLimit": 5,
         },
         {
             "size": (10, 10),
-            "winLength": 5
+            "winLength": 5,
+            "varnishingElementsLimit": 7,
         },
     ]
 
     MODES = [
         {
             "code": Game.MODE_CLASSIC,
-            "label": 'Classic Mode',
+            "label": 'Classic',
         },
         {
             "code": Game.MODE_VARNISHING,
-            "label": 'Varnishing Mode',
+            "label": 'Varnishing',
         }
     ]
 
@@ -56,7 +59,7 @@ class TicTacToe:
         pygame.init()
         pygame.display.set_caption("Tic Tac Toe")
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        #self.screen = pygame.display.set_mode((800, 600))
+        #self.screen = pygame.display.set_mode((1280, 800))
         self.windowWidth, self.windowHeight = self.screen.get_size()
         self.boardHeight = self.windowHeight - 60
         self.boardWidth = self.windowWidth
@@ -86,6 +89,9 @@ class TicTacToe:
                 (self.cellSize * self.game.boardSize[0] + self.marginX, (y + 1) * self.cellSize)
             )
 
+        moveToVarnishing = self.game.getMoveToVarnishing()
+        print(moveToVarnishing)
+
         for x in range(0, self.game.boardSize[0]):
             pygame.draw.line(
                 self.screen, 
@@ -94,10 +100,17 @@ class TicTacToe:
                 ((x + 1) * self.cellSize + self.marginX, self.cellSize * self.game.boardSize[1])
             )
             for y in range(0, self.game.boardSize[1]):
+                color = False
+                if moveToVarnishing == (x,y):
+                    color = "grey"
                 if (self.game.board[x][y] < 0):
-                    self.printX(x, y)
+                    if not color:
+                        color = "red"
+                    self.printX(x, y, color)
                 if (self.game.board[x][y] > 0):
-                    self.printO(x, y)
+                    if not color:
+                        color = "blue"
+                    self.printO(x, y, color)
         if (not self.game.isRunning and self.game.winner != 0):
             winnigLine = self.game.resultChecker.winningRow
             pygame.draw.line(
@@ -148,7 +161,7 @@ class TicTacToe:
         return [x, y]
     
     def printMenu(self):
-        font = pygame.font.Font(None, 170) 
+        font = pygame.font.Font(None, 200) 
         text = font.render("TIC", True, "white")
         textRect = text.get_rect()
         centerX = self.windowWidth / 2
@@ -157,19 +170,20 @@ class TicTacToe:
         self.screen.blit(text, textRect)
         
         text = font.render("TAC", True, "white")
-        centerY = 190
+        centerY = 210
         textRect = text.get_rect()
         textRect.center = (centerX, centerY)
         self.screen.blit(text, textRect)
 
         text = font.render("TOE", True, "white")
-        centerY = 280
+        centerY = 320
         textRect = text.get_rect()
         textRect.center = (centerX, centerY)
         self.screen.blit(text, textRect)
 
-        startButton = Button(self.windowWidth / 2 - 100, 330, 200, 40, "Start")
+        startButton = Button(self.windowWidth / 2 - 150, 380, 300, 80, "Start")
         startButton.setOnclick(self.startGame)
+        startButton.setHoverBackgroudColor("darkgreen")
         startButton.display(self.screen, self.events)
 
         #label = "Train AI"
@@ -183,18 +197,26 @@ class TicTacToe:
         #    trainAiButton.setOnclick(self.trainAi)
         #trainAiButton.display(self.screen, self.events)
 
-        boardLabel = str(self.BOARDS[self.currentBoard]["size"][0]) + "x" + str(self.BOARDS[self.currentBoard]["size"][1]) + ", " + str(self.BOARDS[self.currentBoard]["winLength"]) + " in row to win"
-        boardOptionButton = Button(self.windowWidth / 2 - 100, 380, 200, 40, boardLabel)
+        currentBoard = self.BOARDS[self.currentBoard]
+
+        inRow = str(currentBoard["winLength"])
+
+
+        if self.MODES[self.currentMode]['code'] == Game.MODE_VARNISHING:
+            inRow += '/' + str(currentBoard['varnishingElementsLimit'])
+
+        boardLabel = str(currentBoard["size"][0]) + "x" + str(currentBoard["size"][1]) + ", " + inRow + " in row to win"
+
+        boardOptionButton = Button(self.windowWidth / 2 - 150, 470, 300, 80, boardLabel)
         boardOptionButton.setOnclick(self.nextBoard)
         boardOptionButton.display(self.screen, self.events)
 
-
         modeLabel = self.MODES[self.currentMode]['label']
-        modeOptionButton = Button(self.windowWidth / 2 - 100, 430, 200, 40, modeLabel)
+        modeOptionButton = Button(self.windowWidth / 2 - 150, 560, 300, 80, modeLabel)
         modeOptionButton.setOnclick(self.nextMode)
         modeOptionButton.display(self.screen, self.events)
 
-        exitButton = Button(self.windowWidth / 2 - 100, 480, 200, 40, "Exit")
+        exitButton = Button(self.windowWidth / 2 - 150, 650, 300, 80, "Exit")
         exitButton.setOnclick(self.exit)
         exitButton.setHoverBackgroudColor("red")
         exitButton.display(self.screen, self.events)
@@ -222,7 +244,7 @@ class TicTacToe:
     def initGame(self):
         board = self.BOARDS[self.currentBoard]
         mode = self.MODES[self.currentMode]['code']
-        self.game = Game(board['size'], board['winLength'], mode)
+        self.game = Game(board, mode)
         self.cellSize = min(
             math.floor(self.boardWidth / self.game.boardSize[0]), 
             math.floor(self.boardHeight / self.game.boardSize[1])
@@ -258,7 +280,7 @@ class TicTacToe:
             posX, posY = pygame.mouse.get_pos()
             cell = self.getCellByPosition(posX, posY, False)
             for x in range(0, self.game.boardSize[0]):
-                for y in range(0, self.game.boardSize[1] + 1):
+                for y in range(0, self.game.boardSize[1]):
                     if (cell != False and x == cell[0] and y == cell[1]):
                        isMouseOver = True
                     else:

@@ -5,9 +5,10 @@ class Game:
     MODE_CLASSIC = 'classic';
     MODE_VARNISHING = 'varnishing';
 
-    def __init__(self, boardSize=(3, 3), linesToWin=3, mode=MODE_CLASSIC):
-        self.boardSize = boardSize
-        self.linesToWin = linesToWin
+    def __init__(self, boardSettings, mode=MODE_CLASSIC):
+        self.boardSettings = boardSettings
+        self.boardSize = boardSettings['size']
+        self.linesToWin = boardSettings['winLength']
         self.mode = mode
         self.resultChecker = ResultChecker();
         self.reset()
@@ -43,22 +44,29 @@ class Game:
             Assets.play('click1.wav')
 
             if self.mode == self.MODE_VARNISHING:
-                self.lastMoves[self.currentPlayer].append((move[0], move[1]));
-                if len(self.lastMoves[self.currentPlayer]) > self.linesToWin:
+                moveToVarnishing = self.getMoveToVarnishing()
+                if moveToVarnishing:
+                    self.board[moveToVarnishing[0]][moveToVarnishing[1]] = 0
                     self.emptyCellsQty += 1
-                    oldestMove = self.lastMoves[self.currentPlayer].pop(0)
-                    self.board[oldestMove[0]][oldestMove[1]] = 0
+                    self.lastMoves[self.currentPlayer].pop(0)
+                self.lastMoves[self.currentPlayer].append((move[0], move[1]));
+                
 
             self.getCurrentPlayer().endMove()
             if (self.resultChecker.isWinningMove(self, move)):
                 self.isRunning = False
                 self.winner = self.currentPlayer
-                return
+                #return
             if (self.emptyCellsQty == 0):
                 self.isRunning = 0
-                return
+                #return
             self.nextPlayer()
 
     def nextPlayer(self):
         self.currentPlayer = (-1) * self.currentPlayer
         
+    def getMoveToVarnishing(self):
+        if self.mode == self.MODE_VARNISHING and self.isRunning:
+            if len(self.lastMoves[self.currentPlayer]) >= self.boardSettings['varnishingElementsLimit']:
+                return self.lastMoves[self.currentPlayer][0]
+        return False

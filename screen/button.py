@@ -20,7 +20,7 @@ class Button:
         else:
             backgroundColor = "grey"
             textColor = (40, 40, 40)
-        font = pygame.font.Font(None, 25) 
+        font = pygame.font.Font(None, 35) 
         text = font.render(self.text, True, textColor)
         pygame.draw.rect(screen, backgroundColor, (
             self.x,
