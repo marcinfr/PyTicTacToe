@@ -57,6 +57,8 @@ class Button:
         textRect.center = (centerX, centerY)
         screen.blit(text, textRect)
         if (self.onclick and events.MOUSEBUTTONDOWN and isMouseOverButton):
+            sound = pygame.mixer.Sound("assets/click1.wav")
+            sound.play()
             self.onclick()
 
     def setOnclick(self, callback):

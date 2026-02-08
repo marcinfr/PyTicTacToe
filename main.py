@@ -15,16 +15,35 @@ class TicTacToe:
     STATE_GAME = 1
     STATE_TAINING = 2
 
+    BOARDS = [
+        {
+            "size": (3, 3),
+            "winLength": 3
+        },
+        {
+            "size": (5, 5),
+            "winLength": 4
+        },
+        {
+            "size": (10, 10),
+            "winLength": 5
+        },
+    ]
+
+    MODES = [
+        {
+            "code": Game.MODE_CLASSIC,
+            "label": 'Classic Mode',
+        },
+        {
+            "code": Game.MODE_VARNISHING,
+            "label": 'Varnishing Mode',
+        }
+    ]
+
     def __init__(self):
-        self.game = Game(5, 4)
-        self.player1 = Human("Player Blue", self)
-        #self.aiPlayer = AiPlayer("Ai Player", self.game)
-        #self.aiPlayer = Random("Ai Player", self.game)
-        #self.aiPlayer = AiMonteCarlo("Ai Player", self.game)
-        #self.aiPlayer.setWait(1)
-        #self.player2 = self.aiPlayer
-        self.player2 = Human("Player Red", self)
-        
+        self.currentBoard = 0;
+        self.currentMode = 0;
         #self.cellSize = cellSize
         #self.boardWidth = self.game.boardSize * cellSize
         #self.windowWidth = self.boardWidth
@@ -37,14 +56,11 @@ class TicTacToe:
         pygame.init()
         pygame.display.set_caption("Tic Tac Toe")
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        #self.screen = pygame.display.set_mode((800, 600))
         self.windowWidth, self.windowHeight = self.screen.get_size()
         self.boardHeight = self.windowHeight - 60
         self.boardWidth = self.windowWidth
-        self.cellSize = min(
-            math.floor(self.boardWidth / self.game.boardSize), 
-            math.floor(self.boardHeight / self.game.boardSize)
-        )
-        self.marginX = (self.windowWidth - self.cellSize * self.game.boardSize) / 2
+        self.initGame()
 
     def printBoard(self):
         posX, posY = pygame.mouse.get_pos()
@@ -59,23 +75,25 @@ class TicTacToe:
                 self.screen, 
                 "white", 
                 (self.marginX, 0), 
-                (self.marginX, self.cellSize * self.game.boardSize)
+                (self.marginX, self.cellSize * self.game.boardSize[1])
             )
 
-        for x in range(0, self.game.boardSize):
+        for y in range(0, self.game.boardSize[1]):
+            pygame.draw.line(
+                self.screen, 
+                "white", 
+                (self.marginX, (y + 1) * self.cellSize), 
+                (self.cellSize * self.game.boardSize[0] + self.marginX, (y + 1) * self.cellSize)
+            )
+
+        for x in range(0, self.game.boardSize[0]):
             pygame.draw.line(
                 self.screen, 
                 "white", 
                 ((x + 1) * self.cellSize + self.marginX, 0), 
-                ((x + 1) * self.cellSize + self.marginX, self.cellSize * self.game.boardSize)
+                ((x + 1) * self.cellSize + self.marginX, self.cellSize * self.game.boardSize[1])
             )
-            pygame.draw.line(
-                self.screen, 
-                "white", 
-                (self.marginX, (x + 1) * self.cellSize), 
-                (self.cellSize * self.game.boardSize + self.marginX, (x + 1) * self.cellSize)
-            )
-            for y in range(0, self.game.boardSize):
+            for y in range(0, self.game.boardSize[1]):
                 if (self.game.board[x][y] < 0):
                     self.printX(x, y)
                 if (self.game.board[x][y] > 0):
@@ -120,12 +138,12 @@ class TicTacToe:
         x = int((posX - self.marginX) / self.cellSize);
         if x < 0:
             return False
-        if x > self.game.boardSize:
+        if x > self.game.boardSize[0]:
             return False
         y = int(posY / self.cellSize);
-        if onlyAvailable and (x < 0 or x >= self.game.boardSize):
+        if onlyAvailable and (x < 0 or x >= self.game.boardSize[0]):
             return False
-        if onlyAvailable and (y < 0 or y >= self.game.boardSize):
+        if onlyAvailable and (y < 0 or y >= self.game.boardSize[1]):
             return False
         return [x, y]
     
@@ -165,20 +183,61 @@ class TicTacToe:
         #    trainAiButton.setOnclick(self.trainAi)
         #trainAiButton.display(self.screen, self.events)
 
-        exitButton = Button(self.windowWidth / 2 - 100, 380, 200, 40, "Exit")
+        boardLabel = str(self.BOARDS[self.currentBoard]["size"][0]) + "x" + str(self.BOARDS[self.currentBoard]["size"][1]) + ", " + str(self.BOARDS[self.currentBoard]["winLength"]) + " in row to win"
+        boardOptionButton = Button(self.windowWidth / 2 - 100, 380, 200, 40, boardLabel)
+        boardOptionButton.setOnclick(self.nextBoard)
+        boardOptionButton.display(self.screen, self.events)
+
+
+        modeLabel = self.MODES[self.currentMode]['label']
+        modeOptionButton = Button(self.windowWidth / 2 - 100, 430, 200, 40, modeLabel)
+        modeOptionButton.setOnclick(self.nextMode)
+        modeOptionButton.display(self.screen, self.events)
+
+        exitButton = Button(self.windowWidth / 2 - 100, 480, 200, 40, "Exit")
         exitButton.setOnclick(self.exit)
         exitButton.setHoverBackgroudColor("red")
         exitButton.display(self.screen, self.events)
 
+    def nextBoard(self):
+        self.currentBoard += 1
+        if self.currentBoard >= len(self.BOARDS):
+            self.currentBoard = 0
+        self.initGame()
+
+    def nextMode(self):
+        self.currentMode += 1
+        if self.currentMode >= len(self.MODES):
+            self.currentMode = 0
+
+
     def printGame(self):
         self.printBoard()
-        boardY = self.cellSize * self.game.boardSize;
+        boardY = self.cellSize * self.game.boardSize[1];
         endButton = Button(self.windowWidth - 100 - self.marginX, boardY + 10, 100, 40, "Exit")
         endButton.setOnclick(self.stopGame)
         endButton.setHoverBackgroudColor("red")
         endButton.display(self.screen, self.events)
 
+    def initGame(self):
+        board = self.BOARDS[self.currentBoard]
+        mode = self.MODES[self.currentMode]['code']
+        self.game = Game(board['size'], board['winLength'], mode)
+        self.cellSize = min(
+            math.floor(self.boardWidth / self.game.boardSize[0]), 
+            math.floor(self.boardHeight / self.game.boardSize[1])
+        )
+        self.marginX = (self.windowWidth - self.cellSize * self.game.boardSize[0]) / 2
+
     def startGame(self):
+        self.initGame()
+        self.player1 = Human("Player Blue", self)
+        #self.aiPlayer = AiPlayer("Ai Player", self.game)
+        #self.aiPlayer = Random("Ai Player", self.game)
+        #self.aiPlayer = AiMonteCarlo("Ai Player", self.game)
+        #self.aiPlayer.setWait(1)
+        #self.player2 = self.aiPlayer
+        self.player2 = Human("Player Red", self)
         self.game.reset()
         self.game.addPlayer(self.player1)
         self.game.addPlayer(self.player2)
@@ -198,8 +257,8 @@ class TicTacToe:
         if self.gameState != self.STATE_GAME:
             posX, posY = pygame.mouse.get_pos()
             cell = self.getCellByPosition(posX, posY, False)
-            for x in range(0, self.game.boardSize):
-                for y in range(0, self.game.boardSize + 1):
+            for x in range(0, self.game.boardSize[0]):
+                for y in range(0, self.game.boardSize[1] + 1):
                     if (cell != False and x == cell[0] and y == cell[1]):
                        isMouseOver = True
                     else:
