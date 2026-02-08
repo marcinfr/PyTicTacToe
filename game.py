@@ -1,5 +1,5 @@
 from helpers.resultChecker import ResultChecker
-import pygame
+from helpers.asstes import Assets
 
 class Game:
     MODE_CLASSIC = 'classic';
@@ -40,8 +40,7 @@ class Game:
             self.board[move[0]][move[1]] = self.currentPlayer
             self.emptyCellsQty = self.emptyCellsQty - 1
 
-            sound = pygame.mixer.Sound("assets/click1.wav")
-            sound.play()
+            Assets.play('click1.wav')
 
             if self.mode == self.MODE_VARNISHING:
                 self.lastMoves[self.currentPlayer].append((move[0], move[1]));

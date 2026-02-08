@@ -1,4 +1,5 @@
 import pygame
+from helpers.asstes import Assets
 
 class Button:
     def __init__(self, x, y, width, height, text):
@@ -57,8 +58,7 @@ class Button:
         textRect.center = (centerX, centerY)
         screen.blit(text, textRect)
         if (self.onclick and events.MOUSEBUTTONDOWN and isMouseOverButton):
-            sound = pygame.mixer.Sound("assets/click1.wav")
-            sound.play()
+            Assets.play('click1.wav')
             self.onclick()
 
     def setOnclick(self, callback):
