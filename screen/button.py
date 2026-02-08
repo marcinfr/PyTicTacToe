@@ -58,7 +58,7 @@ class Button:
         textRect.center = (centerX, centerY)
         screen.blit(text, textRect)
         if (self.onclick and events.MOUSEBUTTONDOWN and isMouseOverButton):
-            Assets.play('click1.wav')
+            Assets.play('click3.wav')
             self.onclick()
 
     def setOnclick(self, callback):

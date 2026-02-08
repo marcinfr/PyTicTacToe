@@ -41,7 +41,10 @@ class Game:
             self.board[move[0]][move[1]] = self.currentPlayer
             self.emptyCellsQty = self.emptyCellsQty - 1
 
-            Assets.play('click1.wav')
+            if self.currentPlayer < 0:
+                Assets.play('click1.wav')
+            else:
+                Assets.play('click2.wav')
 
             if self.mode == self.MODE_VARNISHING:
                 moveToVarnishing = self.getMoveToVarnishing()
