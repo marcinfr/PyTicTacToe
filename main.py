@@ -51,9 +51,9 @@ class TicTacToe:
 
     TIMES = [
         0,
+        3,
         5,
-        15,
-        30,
+        10,
     ]
 
     def __init__(self):

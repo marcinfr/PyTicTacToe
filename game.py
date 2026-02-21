@@ -80,9 +80,11 @@ class Game:
             if (self.resultChecker.isWinningMove(self, move)):
                 self.isRunning = False
                 self.winner = self.currentPlayer
+                Assets.play('win1.wav')
                 #return
-            if (self.emptyCellsQty == 0):
+            if (self.isRunning and self.emptyCellsQty == 0):
                 self.isRunning = 0
+                Assets.play('draw1.wav')
                 #return
             self.nextPlayer()
 
