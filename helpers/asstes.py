@@ -8,6 +8,7 @@ class Assets:
             return os.path.join(sys._MEIPASS, relative_path)
         return os.path.join(os.path.abspath("."), relative_path)
     
-    def play(file):
+    def play(file, volume = 1):
         sound = pygame.mixer.Sound(Assets.resource_path("assets/" + file))
+        sound.set_volume(volume)
         sound.play()

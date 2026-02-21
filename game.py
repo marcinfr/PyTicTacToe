@@ -1,5 +1,7 @@
 from helpers.resultChecker import ResultChecker
 from helpers.asstes import Assets
+import pygame
+import math
 
 class Game:
     MODE_CLASSIC = 'classic';
@@ -21,10 +23,17 @@ class Game:
         self.winner = 0
         self.emptyCellsQty = self.boardSize[0] * self.boardSize[1]
         self.players = []
+        self.timeLimit = 0
         self.lastMoves = {
             -1: [],
             1: [],
         }
+
+    def start(self):
+        self.isRunning = True
+        self.timePerMoveLeft = self.timeLimit
+        self.timePerMoveInSeconds = self.timeLimit
+        self.roundStartTime = pygame.time.get_ticks()
 
     def addPlayer(self, player):
         self.players.append(player)
@@ -35,6 +44,18 @@ class Game:
     def run(self, events = False):
         if (not self.isRunning):
             return
+        
+        if self.timeLimit > 0:
+            self.timePerMoveLeft = self.timeLimit - (pygame.time.get_ticks() - self.roundStartTime) / 1000
+            timePerMoveInSeconds = math.ceil(self.timePerMoveLeft)
+            if self.timePerMoveInSeconds != timePerMoveInSeconds:
+                self.timePerMoveInSeconds = timePerMoveInSeconds
+                if timePerMoveInSeconds <= 0:
+                    Assets.play('endtime1.wav')
+                elif timePerMoveInSeconds <= 3:
+                    Assets.play('tick1.wav', 0.2)
+            if self.timePerMoveLeft <= 0:
+                self.isRunning = False
         
         move = self.getCurrentPlayer().getMove(events);
         if (move and self.board[move[0]][move[1]] == 0):
@@ -67,6 +88,7 @@ class Game:
 
     def nextPlayer(self):
         self.currentPlayer = (-1) * self.currentPlayer
+        self.roundStartTime = pygame.time.get_ticks()
         
     def getMoveToVarnishing(self):
         if self.mode == self.MODE_VARNISHING and self.isRunning:
