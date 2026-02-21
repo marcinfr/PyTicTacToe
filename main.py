@@ -79,7 +79,7 @@ class TicTacToe:
         if is_steam_deck:
             pygame.mouse.set_visible(False)
 
-        self.screen = pygame.display.set_mode((1280, 800))
+        #self.screen = pygame.display.set_mode((1280, 800))
         self.windowWidth, self.windowHeight = self.screen.get_size()
         self.boardHeight = self.windowHeight - 40
         self.boardWidth = self.windowWidth
